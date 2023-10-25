@@ -1,5 +1,6 @@
-import pygame #ty pygame
+import pygame
 import random
+import time
 
 pygame.init()
 
@@ -27,21 +28,23 @@ TILE_COLORS = {
     2048: (237, 194, 46)
 }
 
-# Initialize the screen
 screen = pygame.display.set_mode((SCREEN_SIZE, SCREEN_SIZE))
 pygame.display.set_caption('2048')
 
-# Fonts
 font = pygame.font.Font(None, MENU_FONT_SIZE)
 game_over_font = pygame.font.Font(None, MENU_FONT_SIZE)
 score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
 
+grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+
 
 grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+
 
 def draw_rounded_rect(x, y, width, height, radius, color):
     rect = pygame.Rect(x, y, width, height)
     pygame.draw.rect(screen, color, rect, border_radius=radius)
+
 
 def draw_tile(x, y, value):
     if value == 0:
@@ -55,10 +58,12 @@ def draw_tile(x, y, value):
     text_rect = text_surface.get_rect(center=(rect_x + TILE_SIZE / 2, rect_y + TILE_SIZE / 2))
     screen.blit(text_surface, text_rect)
 
+
 def draw_grid():
     for y in range(GRID_SIZE):
         for x in range(GRID_SIZE):
             draw_tile(x, y, grid[y][x])
+
 
 def move(direction):
     global grid
@@ -76,6 +81,30 @@ def move(direction):
             merge_row_right(y)
     add_tile()
 
+
+def animate_tile_movement(start_x, start_y, end_x, end_y, value):
+    step = 0.1  
+    x, y = start_x, start_y
+
+    while x != end_x or y != end_y:
+        screen.fill(BACKGROUND)
+        draw_grid()
+        draw_tile(x, y, value)
+        pygame.display.flip()
+
+        if x < end_x:
+            x = min(x + step, end_x)
+        elif x > end_x:
+            x = max(x - step, end_x)
+
+        if y < end_y:
+            y = min(y + step, end_y)
+        elif y > end_y:
+            y = max(y - step, end_y)
+
+        pygame.time.delay(10)  
+
+
 def merge_column_up(x):
     for y in range(1, GRID_SIZE):
         if grid[y][x] != 0:
@@ -83,10 +112,13 @@ def merge_column_up(x):
                 if grid[y2][x] == 0:
                     grid[y2][x] = grid[y][x]
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x, y2, grid[y2][x])
                 elif grid[y2][x] == grid[y][x]:
                     grid[y2][x] *= 2
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x, y2, grid[y2][x])
                     break
+
 
 def merge_column_down(x):
     for y in range(GRID_SIZE - 2, -1, -1):
@@ -95,10 +127,13 @@ def merge_column_down(x):
                 if grid[y2][x] == 0:
                     grid[y2][x] = grid[y][x]
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x, y2, grid[y2][x])
                 elif grid[y2][x] == grid[y][x]:
                     grid[y2][x] *= 2
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x, y2, grid[y2][x])
                     break
+
 
 def merge_row_left(y):
     for x in range(1, GRID_SIZE):
@@ -107,9 +142,11 @@ def merge_row_left(y):
                 if grid[y][x2] == 0:
                     grid[y][x2] = grid[y][x]
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x2, y, grid[y][x2])
                 elif grid[y][x2] == grid[y][x]:
                     grid[y][x2] *= 2
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x2, y, grid[y][x2])
                     break
 
 def merge_row_right(y):
@@ -119,9 +156,11 @@ def merge_row_right(y):
                 if grid[y][x2] == 0:
                     grid[y][x2] = grid[y][x]
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x2, y, grid[y][x2])
                 elif grid[y][x2] == grid[y][x]:
                     grid[y][x2] *= 2
                     grid[y][x] = 0
+                    animate_tile_movement(x, y, x2, y, grid[y][x2])
                     break
 
 def is_game_over():
