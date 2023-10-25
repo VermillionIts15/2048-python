@@ -28,18 +28,15 @@ TILE_COLORS = {
     2048: (237, 194, 46)
 }
 
+clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_SIZE, SCREEN_SIZE))
 pygame.display.set_caption('2048')
 
 font = pygame.font.Font(None, MENU_FONT_SIZE)
 game_over_font = pygame.font.Font(None, MENU_FONT_SIZE)
 score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
-
 grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
-
-
-grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
-
+animation_queue = []
 
 def draw_rounded_rect(x, y, width, height, radius, color):
     rect = pygame.Rect(x, y, width, height)
@@ -83,10 +80,15 @@ def move(direction):
 
 
 def animate_tile_movement(start_x, start_y, end_x, end_y, value):
-    step = 0.1  
+    step = 0.1
     x, y = start_x, start_y
 
     while x != end_x or y != end_y:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
         screen.fill(BACKGROUND)
         draw_grid()
         draw_tile(x, y, value)
@@ -102,8 +104,13 @@ def animate_tile_movement(start_x, start_y, end_x, end_y, value):
         elif y > end_y:
             y = max(y - step, end_y)
 
-        pygame.time.delay(10)  
+        pygame.time.delay(10)
 
+def process_animations():
+    if animation_queue:
+        animation = animation_queue[0]
+        animation()
+        animation_queue.pop(0)
 
 def merge_column_up(x):
     for y in range(1, GRID_SIZE):
@@ -113,12 +120,12 @@ def merge_column_up(x):
                     grid[y2][x] = grid[y][x]
                     grid[y][x] = 0
                     animate_tile_movement(x, y, x, y2, grid[y2][x])
+                    break
                 elif grid[y2][x] == grid[y][x]:
                     grid[y2][x] *= 2
                     grid[y][x] = 0
                     animate_tile_movement(x, y, x, y2, grid[y2][x])
                     break
-
 
 def merge_column_down(x):
     for y in range(GRID_SIZE - 2, -1, -1):
@@ -128,12 +135,7 @@ def merge_column_down(x):
                     grid[y2][x] = grid[y][x]
                     grid[y][x] = 0
                     animate_tile_movement(x, y, x, y2, grid[y2][x])
-                elif grid[y2][x] == grid[y][x]:
-                    grid[y2][x] *= 2
-                    grid[y][x] = 0
-                    animate_tile_movement(x, y, x, y2, grid[y2][x])
                     break
-
 
 def merge_row_left(y):
     for x in range(1, GRID_SIZE):
@@ -141,10 +143,6 @@ def merge_row_left(y):
             for x2 in range(x - 1, -1, -1):
                 if grid[y][x2] == 0:
                     grid[y][x2] = grid[y][x]
-                    grid[y][x] = 0
-                    animate_tile_movement(x, y, x2, y, grid[y][x2])
-                elif grid[y][x2] == grid[y][x]:
-                    grid[y][x2] *= 2
                     grid[y][x] = 0
                     animate_tile_movement(x, y, x2, y, grid[y][x2])
                     break
@@ -155,10 +153,6 @@ def merge_row_right(y):
             for x2 in range(x + 1, GRID_SIZE):
                 if grid[y][x2] == 0:
                     grid[y][x2] = grid[y][x]
-                    grid[y][x] = 0
-                    animate_tile_movement(x, y, x2, y, grid[y][x2])
-                elif grid[y][x2] == grid[y][x]:
-                    grid[y][x2] *= 2
                     grid[y][x] = 0
                     animate_tile_movement(x, y, x2, y, grid[y][x2])
                     break
@@ -201,6 +195,8 @@ win = False
 reset_game()
 
 while running:
+    clock.tick(60)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -224,7 +220,10 @@ while running:
             reset_game()
 
     screen.fill(BACKGROUND)
-    
+
+    # Process animations
+    process_animations()
+
     draw_grid()
 
     points_text = score_font.render(f'Points: {points}', True, SCORE_FONT_COLOR)
