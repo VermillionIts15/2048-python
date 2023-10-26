@@ -55,7 +55,7 @@ To get a local copy up and running, follow these simple steps:
 2. Change to the project directory:
 
    ```sh
-   cd 2048-game
+   cd 2048-python
    ```
 
 3. Run the game:
