@@ -39,7 +39,6 @@ score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
 class Game2048:
     def __init__(self):
         self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
-        self.animation_queue = []
         self.points = 0
         self.game_over = False
         self.win = False
@@ -82,39 +81,6 @@ class Game2048:
                 self.merge_row_right(y)
         self.add_tile()
 
-    def animate_tile_movement(self, start_x, start_y, end_x, end_y, value):
-        step = 0.1
-        x, y = start_x, start_y
-
-        while x != end_x or y != end_y:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-
-            screen.fill(BACKGROUND)
-            self.draw_grid()
-            self.draw_tile(x, y, value)
-            pygame.display.flip()
-
-            if x < end_x:
-                x = min(x + step, end_x)
-            elif x > end_x:
-                x = max(x - step, end_x)
-
-            if y < end_y:
-                y = min(y + step, end_y)
-            elif y > end_y:
-                y = max(y - step, end_y)
-
-            pygame.time.delay(10)
-
-    def process_animations(self):
-        if self.animation_queue:
-            animation = self.animation_queue[0]
-            animation()
-            self.animation_queue.pop(0)
-
     def merge_column_up(self, x):
         for y in range(1, GRID_SIZE):
             if self.grid[y][x] != 0:
@@ -122,13 +88,10 @@ class Game2048:
                     if self.grid[y2][x] == 0:
                         self.grid[y2][x] = self.grid[y][x]
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x, y2=y2, value=self.grid[y2][x]: self.animate_tile_movement(x, y, x2, y2, value))
                         break
                     elif self.grid[y2][x] == self.grid[y][x]:
                         self.grid[y2][x] *= 2
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x, y2=y2, value=self.grid[y2][x]: self.animate_tile_movement(x, y, x2, y2, value))
-                        break
 
     def merge_column_down(self, x):
         for y in range(GRID_SIZE - 2, -1, -1):
@@ -137,12 +100,9 @@ class Game2048:
                     if self.grid[y2][x] == 0:
                         self.grid[y2][x] = self.grid[y][x]
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x, y2=y2, value=self.grid[y2][x]: self.animate_tile_movement(x, y, x2, y2, value))
                     elif self.grid[y2][x] == self.grid[y][x]:
                         self.grid[y2][x] *= 2
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x, y2=y2, value=self.grid[y2][x]: self.animate_tile_movement(x, y, x2, y2, value))
-                        break
 
     def merge_row_left(self, y):
         for x in range(1, GRID_SIZE):
@@ -151,12 +111,9 @@ class Game2048:
                     if self.grid[y][x2] == 0:
                         self.grid[y][x2] = self.grid[y][x]
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x2, y2=y, value=self.grid[y][x2]: self.animate_tile_movement(x, y, x2, y2, value))
                     elif self.grid[y][x2] == self.grid[y][x]:
                         self.grid[y][x2] *= 2
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x2, y2=y, value=self.grid[y][x2]: self.animate_tile_movement(x, y, x2, y2, value))
-                        break
 
     def merge_row_right(self, y):
         for x in range(GRID_SIZE - 2, -1, -1):
@@ -165,12 +122,9 @@ class Game2048:
                     if self.grid[y][x2] == 0:
                         self.grid[y][x2] = self.grid[y][x]
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x2, y2=y, value=self.grid[y][x2]: self.animate_tile_movement(x, y, x2, y2, value))
                     elif self.grid[y][x2] == self.grid[y][x]:
                         self.grid[y][x2] *= 2
                         self.grid[y][x] = 0
-                        self.animation_queue.append(lambda x=x, y=y, x2=x2, y2=y, value=self.grid[y][x2]: self.animate_tile_movement(x, y, x2, y2, value))
-                        break
 
     def is_game_over(self):
         # Check if there are available moves
@@ -230,9 +184,6 @@ while True:
             game.reset_game()
 
     screen.fill(BACKGROUND)
-
-    # Process animations
-    game.process_animations()
 
     game.draw_grid()
 
