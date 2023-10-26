@@ -4,13 +4,26 @@ This is a simple implementation of the classic 2048 game in Python using Pygame.
 
 ## Table of Contents
 
+- [Planned Features](#planned)
 - [Features](#features)
 - [Demo](#demo)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
-- [Customization](#customization)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Planned
+
+- Main menu with settings, being able to enable features like: AI Solver, Debug mode, change grid size, debug mode.
+- Gamemodes (Endless, Powerups, 4096, Big Grid)
+- Cheat/Debug Panel
+- Animations + Effects
+- More customization (Without having to edit the script)
+- Mod loader
+- Mouse support
+- Touch pad support (maybe?)
+
+Note: Those features are planned to be finished in 1.0, Planned things may not be included in 1.0 or many more things may come.
 
 ## Features
 
@@ -56,10 +69,6 @@ To get a local copy up and running, follow these simple steps:
 - Use the arrow keys to move tiles.
 - Merge tiles with the same values to increase their value.
 - The goal is to create a tile with the value of 2048.
-
-## Customization
-
-You can customize the game by modifying variables in the code, such as colors, fonts, or grid size.
 
 ## Contributing
 
