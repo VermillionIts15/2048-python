@@ -8,6 +8,7 @@ WHITE = (255, 255, 255)
 BACKGROUND = (187, 173, 160)
 FONT_COLOR = (119, 110, 101)
 SCORE_FONT_COLOR = (249, 246, 242)
+YOU_WIN_COLOR = (15, 15, 15)
 SCORE_FONT_SIZE = 32
 MENU_FONT_SIZE = 48
 TILE_COLORS = {
@@ -258,7 +259,7 @@ while True:
             screen.blit(restart_text, restart_rect)
 
         if game.win:
-            win_text = game_over_font.render("You Win!", True, FONT_COLOR)
+            win_text = game_over_font.render("You Win!", True, YOU_WIN_COLOR)
             win_rect = win_text.get_rect(center=(SCREEN_SIZE / 2, SCREEN_SIZE / 2))
             screen.blit(win_text, win_rect)
 
